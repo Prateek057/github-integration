@@ -2,7 +2,7 @@ const fs = require("fs");
 const {gitCommitPush} = require("./git-commit-push-via-github-api");
 
 process.on("unhandledRejection", console.dir);
-
+process.env.DEBUG = "*";
 gitCommitPush({
     // commit to https://github.com/azu/commit-to-github-test
     owner: "PrateekSB",
@@ -11,11 +11,11 @@ gitCommitPush({
     files: [
         {path: "README.md", content: fs.readFileSync(__dirname + "/README.md", "utf-8")},
     ],
-    fullyQualifiedRef: "heads/master",
-    forceUpdate: false, // optional default = false
+    fullyQualifiedRef: "heads/develop",
+    forceUpdate: true, // optional default = false
     commitMessage: "HELLO"})
     .then(res => {
-        console.log("success", res);
+        console.log("success", res);x
     })
     .catch(err => {
         console.error(err);

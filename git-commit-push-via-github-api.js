@@ -14,7 +14,7 @@ let getReferenceCommit = function (github, options) {
                 debug("getReferenceCommit Error", JSON.stringify(err, null, "  "));
                 return reject(err);
             }
-            debug("getReferenceCommit Response: %O", res);
+            console.log("getReferenceCommit Response: %O", res);
             return resolve({ referenceCommitSha: res.data.object.sha });
         });
     });
@@ -71,7 +71,7 @@ let createTree = function (github, options, data) {
                     debug("createTree", JSON.stringify(err, null, "  "));
                     return reject(err);
                 }
-                debug("createTree Response: %O", res);
+                console.log("createTree Response: %O", res);
                 return resolve(Object.assign(data, { newTreeSha: res.data.sha }));
             });
         });
@@ -87,10 +87,10 @@ let createCommit = function (github, options, data) {
             parents: [data.referenceCommitSha]
         }, function (err, res) {
             if (err) {
-                debug("createCommit", JSON.stringify(err, null, "  "));
+                console.log("createCommit", JSON.stringify(err, null, "  "));
                 return reject(err);
             }
-            debug("createCommit Response: %O", res);
+            console.log("createCommit Response: %O", res);
             return resolve(Object.assign(data, { newCommitSha: res.data.sha }));
         });
     });
@@ -105,10 +105,10 @@ let updateReference = function (github, options, data) {
             force: options.forceUpdate
         }, function (err, data) {
             if (err) {
-                debug("updateReference", JSON.stringify(err, null, "  "));
+                console.log("updateReference", JSON.stringify(err, null, "  "));
                 return reject(err);
             }
-            debug("updateReference Response: %O", data);
+            console.log("updateReference Response: %O", data);
             return resolve(data);
         });
     });
@@ -122,7 +122,7 @@ exports.gitCommitPush = function (options) {
         throw new Error("token is not defined");
     }
     let gitHub = new GitHubApi({
-        auth: `token ${token}`
+        auth: `${token}`
     });
     let filledOptions = {
         owner: options.owner,
@@ -132,10 +132,9 @@ exports.gitCommitPush = function (options) {
         forceUpdate: options.forceUpdate || false,
         commitMessage: options.commitMessage || "Commit - " + new Date().getTime().toString()
     };
-    debug("options %O", options);
+    console.log("options %O", options);
     return getReferenceCommit(gitHub, filledOptions)
         .then(function (data) { return createTree(gitHub, filledOptions, data); })
         .then(function (data) { return createCommit(gitHub, filledOptions, data); })
         .then(function (data) { return updateReference(gitHub, filledOptions, data); });
 };
-//# sourceMappingURL=git-commit-push-via-github-api.js.map

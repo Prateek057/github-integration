@@ -1,5 +1,5 @@
 const fs = require("fs");
-const {gitCommitPush} = require("git-commit-push-via-github-api");
+const {gitCommitPush} = require("./git-commit-push-via-github-api");
 
 process.on("unhandledRejection", console.dir);
 

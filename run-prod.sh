@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
-npm install && npm run push-master
+npm install
+GITHUB_API_TOKEN=6942649043385ed7a59e021678255f21273f4b64
+GITHUB_OWNER=PrateekSB
+GITHUB_REPO=dummy
+COMMIT_MESSAGE='Updated README'
+FORCE_UPDATE=false
+npm run push-master

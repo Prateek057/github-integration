@@ -1,5 +1,4 @@
-### Read Me
+# Github Integration Server
+Simple node server to push files to github branches
 
-#### Had fun doing this ?
-
-###### No Cant commit this one ####
+## Installation guide

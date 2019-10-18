@@ -1,0 +1,16 @@
+{
+  "name": "github-integration",
+  "version": "1.0.0",
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/rest": "^16.33.1",
+    "debug": "latest",
+    "dotenv": "^8.2.0",
+    "fs": "^0.0.1-security",
+    "git-commit-push-via-github-api": "^1.0.2"
+  },
+  "scripts": {
+    "push-dev": "FULLY_QUALIFIED_REFERENCE=heads/develop node -r dotenv/config server.js",
+    "push-master": "FULLY_QUALIFIED_REFERENCE=heads/master node -r dotenv/config server.js"
+  }
+}

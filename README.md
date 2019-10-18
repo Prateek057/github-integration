@@ -5,6 +5,9 @@ Requires you to use [github api token](https://help.github.com/en/articles/creat
 ### Prerequisites 
 - node
 - npm
+- npm packages
+    - dotenv
+    - @octokit/rest
 
 ### Installations
 `npm install`

@@ -1,0 +1,4 @@
+#### example.env
+
+### Copy and rename to .env
+GITHUB_API_TOKEN

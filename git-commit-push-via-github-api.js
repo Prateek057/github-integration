@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let GitHubApi = require("@octokit/rest");
-let debug = require("debug")("git-commit-push-via-github-api");
+let git_commit_debug = require("debug")("git-commit-push-via-github-api");
 let GITHUB_API_TOKEN = process.env.GITHUB_API_TOKEN;
 let getReferenceCommit = function (github, options) {
     return new Promise(function (resolve, reject) {
@@ -9,13 +9,12 @@ let getReferenceCommit = function (github, options) {
             owner: options.owner,
             repo: options.repo,
             ref: options.fullyQualifiedRef
-        }, function (err, res) {
-            if (err) {
-                debug("getReferenceCommit Error", JSON.stringify(err, null, "  "));
-                return reject(err);
-            }
-            console.log("getReferenceCommit Response: %O", res);
+        }).then(res => {
+            git_commit_debug("getReferenceCommit Response: %O", res);
             return resolve({ referenceCommitSha: res.data.object.sha });
+        }).catch(err => {
+            git_commit_debug("getReferenceCommit Error", JSON.stringify(err, null, "  "));
+            return reject(err);
         });
     });
 };
@@ -59,20 +58,19 @@ let createTree = function (github, options, data) {
             throw new Error("This file can not handled: " + file);
         });
         return Promise.all(promises).then(function (files) {
-            debug("files: %O", files);
+            git_commit_debug("files: %O", files);
             // TODO: d.ts bug?
             github.git.createTree({
                 owner: options.owner,
                 repo: options.repo,
                 tree: files,
                 base_tree: data.referenceCommitSha
-            }, function (err, res) {
-                if (err) {
-                    debug("createTree", JSON.stringify(err, null, "  "));
-                    return reject(err);
-                }
-                console.log("createTree Response: %O", res);
+            }).then(res => {
+                git_commit_debug("createTree Response: %O", res);
                 return resolve(Object.assign(data, { newTreeSha: res.data.sha }));
+            }).catch(err => {
+                git_commit_debug("createTree", JSON.stringify(err, null, "  "));
+                return reject(err);
             });
         });
     });
@@ -85,13 +83,12 @@ let createCommit = function (github, options, data) {
             message: options.commitMessage || "commit",
             tree: data.newTreeSha,
             parents: [data.referenceCommitSha]
-        }, function (err, res) {
-            if (err) {
-                console.log("createCommit", JSON.stringify(err, null, "  "));
-                return reject(err);
-            }
-            console.log("createCommit Response: %O", res);
+        }).then(res => {
+            git_commit_debug("createCommit Response: %O", res);
             return resolve(Object.assign(data, { newCommitSha: res.data.sha }));
+        }).catch(err => {
+            git_commit_debug("createCommit", JSON.stringify(err, null, "  "));
+            return reject(err);
         });
     });
 };
@@ -103,13 +100,12 @@ let updateReference = function (github, options, data) {
             ref: options.fullyQualifiedRef,
             sha: data.newCommitSha,
             force: options.forceUpdate
-        }, function (err, data) {
-            if (err) {
-                console.log("updateReference", JSON.stringify(err, null, "  "));
-                return reject(err);
-            }
-            console.log("updateReference Response: %O", data);
+        }).then(data => {
+            git_commit_debug("updateReference Response: %O", data);
             return resolve(data);
+        }).catch(err => {
+            git_commit_debug("updateReference", JSON.stringify(err, null, "  "));
+            return reject(err);
         });
     });
 };
@@ -128,11 +124,10 @@ exports.gitCommitPush = function (options) {
         owner: options.owner,
         repo: options.repo,
         files: options.files,
-        fullyQualifiedRef: options.fullyQualifiedRef || "heads/dev",
+        fullyQualifiedRef: options.fullyQualifiedRef,
         forceUpdate: options.forceUpdate || false,
         commitMessage: options.commitMessage || "Commit - " + new Date().getTime().toString()
     };
-    console.log("options %O", options);
     return getReferenceCommit(gitHub, filledOptions)
         .then(function (data) { return createTree(gitHub, filledOptions, data); })
         .then(function (data) { return createCommit(gitHub, filledOptions, data); })

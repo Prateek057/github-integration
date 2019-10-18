@@ -1,22 +1,20 @@
 const fs = require("fs");
 const {gitCommitPush} = require("./git-commit-push-via-github-api");
-
+const {getFilesToPush} = require("./filesConfig");
+const server_debug = require('debug')('server');
+const filesToPush = getFilesToPush();
 process.on("unhandledRejection", console.dir);
-process.env.DEBUG = "*";
 gitCommitPush({
     // commit to https://github.com/azu/commit-to-github-test
-    owner: "PrateekSB",
-    repo: "dummy",
-    token: "6942649043385ed7a59e021678255f21273f4b64",
-    files: [
-        {path: "README.md", content: fs.readFileSync(__dirname + "/README.md", "utf-8")},
-    ],
-    fullyQualifiedRef: "heads/develop",
-    forceUpdate: true, // optional default = false
-    commitMessage: "HELLO"})
+    owner: process.env.GITHUB_OWNER,
+    repo: process.env.GITHUB_REPO,
+    files: filesToPush,
+    fullyQualifiedRef: process.env.FULLY_QUALIFIED_REFERENCE,
+    forceUpdate: process.env.FORCE_UPDATE ? Boolean(process.env.FORCE_UPDATE) : false,
+    commitMessage: process.env.COMMIT_MESSAGE})
     .then(res => {
-        console.log("success", res);x
+        server_debug("success", JSON.stringify(res));
     })
     .catch(err => {
-        console.error(err);
+        server_debug(err);
     });
